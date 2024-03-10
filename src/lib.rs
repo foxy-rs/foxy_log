@@ -4,7 +4,6 @@ use tracing_subscriber::fmt::SubscriberBuilder;
 
 pub mod builder;
 pub mod format;
-pub mod init;
 pub mod level;
 pub mod prelude;
 

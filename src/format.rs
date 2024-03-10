@@ -2,7 +2,7 @@ use crate::level::LogLevel;
 
 #[allow(unused)]
 pub fn format_filter_slice(crate_logging_levels: &[(&str, Option<LogLevel>)]) -> String {
-  let mut filter = String::from("RUST_LOG=off,");
+  let mut filter = String::from("");
   let joined: String = crate_logging_levels
     .iter()
     .map(|(name, level)| {

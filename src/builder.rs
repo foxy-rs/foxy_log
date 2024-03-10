@@ -15,54 +15,34 @@ pub struct LoggingSession {
 
 impl Default for LoggingSession {
   fn default() -> Self {
-    Self::new()
-  }
-}
-
-impl LoggingSession {
-  pub fn new() -> Self {
     Self {
-      filter: String::new().into(),
-      thread_names: true,
+      filter: "".into(),
+      thread_names: false,
       file_names: false,
       line_numbers: false,
     }
   }
+}
 
-  pub fn with_filter(self, filter: impl Into<EnvFilter>) -> Self {
-    Self {
-      filter: filter.into(),
-      thread_names: self.thread_names,
-      file_names: self.file_names,
-      line_numbers: self.line_numbers,
-    }
+impl LoggingSession {
+  pub fn with_filter(mut self, filter: impl Into<EnvFilter>) -> Self {
+    self.filter = filter.into();
+    self
   }
 
-  pub fn with_thread_names(self, enable: bool) -> Self {
-    Self {
-      filter: self.filter,
-      thread_names: enable,
-      file_names: self.file_names,
-      line_numbers: self.line_numbers,
-    }
+  pub fn with_thread_names(mut self, enable: bool) -> Self {
+    self.thread_names = enable;
+    self
   }
 
-  pub fn with_file_names(self, enable: bool) -> Self {
-    Self {
-      filter: self.filter,
-      thread_names: self.thread_names,
-      file_names: enable,
-      line_numbers: self.line_numbers,
-    }
+  pub fn with_file_names(mut self, enable: bool) -> Self {
+    self.file_names = enable;
+    self
   }
 
-  pub fn with_line_numbers(self, enable: bool) -> Self {
-    Self {
-      filter: self.filter,
-      thread_names: self.thread_names,
-      file_names: self.file_names,
-      line_numbers: enable,
-    }
+  pub fn with_line_numbers(mut self, enable: bool) -> Self {
+    self.line_numbers = enable;
+    self
   }
 
   pub fn finalize(self) -> SubscriberBuilder<DefaultFields, Format, EnvFilter> {
@@ -74,12 +54,7 @@ impl LoggingSession {
   }
 
   pub fn start(self) {
-    tracing_subscriber::fmt()
-      .with_env_filter(self.filter)
-      .with_thread_names(self.thread_names)
-      .with_file(self.file_names)
-      .with_line_number(self.line_numbers)
-      .init();
+    self.finalize().init();
   }
 }
 
@@ -87,7 +62,7 @@ impl LoggingSession {
 macro_rules! logging_session {
   () => {{
     const NAME: &str = env!("CARGO_PKG_NAME");
-    $crate::builder::LoggingSession::new().with_filter($crate::format::format_filter_slice(&[
+    $crate::builder::LoggingSession::default().with_filter($crate::format::format_filter_slice(&[
       ("RUST_LOG", None),
       (NAME, Some($crate::level::LogLevel::Trace)),
     ]))
@@ -98,7 +73,7 @@ macro_rules! logging_session {
 macro_rules! logging_session_ex {
     ($($levels:expr),+) => {{
         const NAME: &str = env!("CARGO_PKG_NAME");
-        $crate::builder::LoggingSession::new()
+        $crate::builder::LoggingSession::default()
             .with_filter($crate::format::format_filter_slice(&[("RUST_LOG", None), (NAME, Some($crate::level::LogLevel::Trace)), $($levels),+]))
     }};
 }

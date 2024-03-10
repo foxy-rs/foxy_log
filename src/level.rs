@@ -1,8 +1,7 @@
-use strum::Display;
 use tracing_subscriber::filter::LevelFilter;
 
 #[allow(unused)]
-#[derive(Default, Display, Debug)]
+#[derive(Default, Debug)]
 #[strum(serialize_all = "snake_case")]
 pub enum LogLevel {
   Trace,
